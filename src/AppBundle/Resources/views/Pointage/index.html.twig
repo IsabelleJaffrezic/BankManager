@@ -1,0 +1,26 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>
+            Liste des pointages
+            <a href="{{ path('app_pointage_post') }}" class="btn btn-success">Nouveau pointage</a>
+        </h1>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Libellé</th>
+                    <th>Catégorie</th>
+                </tr>
+            </thead>
+            {% for pointage in pointageListe %}
+                <tr>
+                    <td>
+                        <a href="{{ path('app_pointage_put', { 'pointage':pointage.id }) }}">{{ pointage.libelle }}</a>
+                    </td>
+                    <td>{{ pointage.categorie }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

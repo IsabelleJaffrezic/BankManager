@@ -1,0 +1,9 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>
+        Nouvelle catégorie
+    </h1>
+    {{ include('@App/Categorie/form_categorie.html.twig', { 'new':true }) }}
+{% endblock %}
+

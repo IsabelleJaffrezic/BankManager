@@ -1,0 +1,12 @@
+{% extends '::base.html.twig' %}
+
+{% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block body %}
+    <h1>
+        Modification opération <small>dans {{ compte.libelle }}</small>
+        <a href="{{ path('app_operation_index', { 'compte':compte.id }) }}" class="btn btn-xs btn-default">Retour à la liste</a>
+    </h1>
+    {{ include('@App/Operation/form_operation.html.twig') }}
+{% endblock %}
+

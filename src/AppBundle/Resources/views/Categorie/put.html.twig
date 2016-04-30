@@ -1,0 +1,11 @@
+{% extends '::base.html.twig' %}
+
+{% form_theme form 'bootstrap_3_horizontal_layout.html.twig' %}
+
+{% block body %}
+    <h1>
+        Modification catégorie
+    </h1>
+    {{ include('@App/Categorie/form_categorie.html.twig') }}
+{% endblock %}
+

@@ -1,0 +1,42 @@
+{{ form_start(form, { 'attr': { 'class':'form-horizontal' } }) }}
+{{ form_errors(form) }}
+<div class="row-fluid">
+    <div class="col-lg-6">
+        <div class="form-group">
+            {{ form_label(form.libelle, null, { 'label_attr' : { 'class':'control-label col-sm-3' } }) }}
+            <div class="col-sm-9">
+                {{ form_widget(form.libelle, { 'attr' : { 'class':'form-control'  } }) }}
+                {{ form_errors(form.libelle) }}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="form-group">
+            {{ form_label(form.categorie, null, { 'label_attr' : { 'class':'control-label col-sm-3' } }) }}
+            <div class="col-sm-9">
+                {{ form_widget(form.categorie, { 'attr' : { 'class':'form-control'  } }) }}
+                {{ form_errors(form.categorie) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="col-lg-12">
+        <div class="pull-right">
+            <a href="{{ path('app_pointage_index') }}" class="btn btn-default">Annuler</a>
+            {{ form_widget(form.save, { 'attr': {'class':'btn btn-success'} }) }}
+        </div>
+    </div>
+</div>
+{{ form_end(form) }}
+
+<div class="row-fluid">
+    <div class="col-lg-12">
+        <div class="pull-left">
+            {% if not(new|default(false)) %}
+                {{ render(controller('AppBundle:Pointage:delete', {'pointage':pointage.id})) }}
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,12 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <h1>Liste des comptes</h1>
+        <ul>
+            {% for compte in compteListe %}
+                <li><a href="{{ path('app_operation_index', { 'compte':compte.id }) }}">{{ compte.libelle }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

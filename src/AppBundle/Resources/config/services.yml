@@ -1,0 +1,8 @@
+# src/AppBundle/Resources/config/services.yml
+services:
+    app.service.import:
+        class: AppBundle\Service\ImportService
+        arguments: ['@doctrine.orm.default_entity_manager']
+    app.service.category:
+        class: AppBundle\Service\CategoryService
+        arguments: ['@doctrine.orm.default_entity_manager']

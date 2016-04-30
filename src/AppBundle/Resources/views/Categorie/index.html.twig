@@ -1,0 +1,30 @@
+{% extends '::base.html.twig' %}
+
+{% block body %}
+    <h1>Liste des catégories <a href="{{ path('app_categorie_post') }}" class="btn btn-primary">Nouvelle</a></h1>
+
+    <table class="table table-condensed table-striped table-condensed table-bordered">
+        <thead>
+            <tr>
+                <th>Thèmes</th>
+                <th colspan="6">Catégories</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for categorie in categorieListe %}
+            <tr>
+                <td rowspan="{{ (categorie.children|length / 6)|round(0, 'ceil') }}"><a href="{{ path('app_categorie_put', { 'categorie':categorie.0.id }) }}">{{ categorie.0.libelle }}</a></td>
+            {% for child in categorie.children|batch(6, '') %}
+                {% for column in child %}
+                    <td>
+                    {% if column is not empty %}
+                        <a href="{{ path('app_categorie_put', { 'categorie':column.id }) }}">{{ column }}</a>
+                    {% endif %}
+                    </td>
+                {% endfor %}
+                </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
