@@ -36,7 +36,7 @@ class CategorieFormType extends AbstractType
                     'class' => 'AppBundle\Entity\Categorie',
                     'required' => false,
                     'query_builder' => function(CategorieRepository $qb) use ($data) {
-                        return $qb->findByParentNull($data);
+                        return $qb->findByParentNull(!empty($data->getId()) ? $data : null);
                     }
                 ]);
         });

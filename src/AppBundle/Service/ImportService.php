@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Service;
+use AppBundle\Entity\Compte;
 use AppBundle\Entity\ModePaiement;
 use AppBundle\Entity\Operation;
 use DateTime;
@@ -21,14 +22,14 @@ class ImportService
         $this->om = $objectManager;
     }
 
-    public function convertFile($pathFile)
+    public function convertFile($pathFile, Compte $compte)
     {
         $file = file_get_contents($pathFile);
         $lines = explode("\n", $file);
 
         $nbLineConverties = 0;
         foreach ($lines as $key => $line) {
-            if ($this->convertLine($line)) {
+            if ($this->convertLine($line, $compte)) {
                 $nbLineConverties++;
             }
         }
@@ -39,12 +40,10 @@ class ImportService
         ];
     }
 
-    public function convertLine($line)
+    public function convertLine($line, Compte $compte)
     {
         try {
             $data = str_getcsv($line, ";");
-
-            $compte = $this->om->getRepository('AppBundle:Compte')->find(1);
 
             $modePaiementRepo = $this->om->getRepository('AppBundle:ModePaiement');
             $modePaiement = $modePaiementRepo->findOneBy(array('libelle' => $data[2]));
@@ -61,12 +60,12 @@ class ImportService
             $operation = new Operation();
             $operation->setCompte($compte);
             $operation->setDateOperation($dateOperation);
-            if ($dateValue instanceof DateTime) {
-                $operation->setDateValeur($dateValue);
-            }
             $operation->setLibelle($data[3]);
             $operation->setMontant((float)$data[4]);
             $operation->setModePaiement($modePaiement);
+            if ($dateValue instanceof DateTime) {
+                $operation->setDateValeur($dateValue);
+            }
 
             $this->om->persist($operation);
             $this->om->flush();

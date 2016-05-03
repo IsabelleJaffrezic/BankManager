@@ -6,3 +6,6 @@ services:
     app.service.category:
         class: AppBundle\Service\CategoryService
         arguments: ['@doctrine.orm.default_entity_manager']
+    app.service.compte:
+        class: AppBundle\Service\CompteService
+        arguments: ['@doctrine.orm.default_entity_manager']
