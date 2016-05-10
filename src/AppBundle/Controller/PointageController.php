@@ -15,6 +15,7 @@ class PointageController extends Controller
 {
     /**
      * @Route("/pointages")
+     * @Template()
      */
     public function indexAction(Request $request)
     {
@@ -23,10 +24,9 @@ class PointageController extends Controller
             ->getRepository('AppBundle:Pointage')
             ->findAll();
 
-        // replace this example code with whatever you need
-        return $this->render('AppBundle:Pointage:index.html.twig', [
+        return [
             'pointageListe' => $pointageListe,
-        ]);
+        ];
     }
 
     /**

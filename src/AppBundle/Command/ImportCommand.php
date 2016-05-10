@@ -6,6 +6,7 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\HttpKernel\Config\FileLocator;
@@ -39,12 +40,16 @@ class ImportCommand extends ContainerAwareCommand
         $finder = new Finder();
         $finder->files()->in(__DIR__.'/../../../app/Resources/imports')->name('*.csv');
 
+        $fs = new Filesystem();
+
         /** @var SplFileInfo $file */
         foreach ($finder as $file) {
             $output->writeln('<comment>Conversion du fichier : '.$file->getRealPath().'</comment>');
             $result = $importService->convertFile($file->getRealPath(), $compte);
             $output->writeln('-> Nb lignes dans le fichier : '.$result['nbLine']);
             $output->writeln('-> Nb lignes converties : '.$result['nbLineConvertie']);
+
+            $fs->remove($file->getRealPath());
         }
 
         $output->writeln('<info>Import terminé</info>');
