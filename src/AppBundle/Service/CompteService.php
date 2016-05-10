@@ -19,6 +19,8 @@ class CompteService
         $compte = new Compte();
         $compte->setLibelle($libelle);
         $compte->setSoldeInitial($soldeInitial);
+        $compte->setCurrentSolde(0);
+        $compte->setSoldePrevisionnel(0);
 
         if ($flush) {
             $this->om->persist($compte);
@@ -26,5 +28,10 @@ class CompteService
         }
 
         return $compte;
+    }
+
+    public function find($id)
+    {
+        return $this->om->getRepository('AppBundle:Compte')->find($id);
     }
 }

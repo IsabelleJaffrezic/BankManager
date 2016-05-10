@@ -3,6 +3,7 @@ namespace AppBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,7 +24,7 @@ class CompteCommand extends ContainerAwareCommand
             ->setDescription('Création d\'un compte')
             ->addArgument('libelle', InputArgument::REQUIRED, 'Libellé du compte')
             ->addArgument('soldeInitial', InputArgument::REQUIRED, 'Solde initial du compte')
-            ->addOption('import', 'i', InputOption::VALUE_OPTIONAL, 'Chemin d\'un fichier d\'importation à la création')
+            ->addOption('import', 'i', InputOption::VALUE_NONE, 'Importe les fichiers')
         ;
     }
 
@@ -32,6 +33,13 @@ class CompteCommand extends ContainerAwareCommand
         $compteService = $this->getContainer()->get('app.service.compte');
         $compte = $compteService->createCompte($input->getArgument('libelle'), $input->getArgument('soldeInitial'));
 
-        $output->writeln($input->getOption('import'));
+        $output->writeln('Compte créé');
+
+        if ($input->getOption('import')) {
+            $command = $this->getApplication()->find('import:operations');
+            $command->run(new ArrayInput(['compte' => $compte->getId()]), $output);
+        }
+
+        $output->writeln('Terminé !');
     }
 }
