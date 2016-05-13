@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: zazhu
- * Date: 09/04/16
- * Time: 21:01
+ * Date: 13/05/16
+ * Time: 20:08
  */
 
 namespace AppBundle\Form;
@@ -12,12 +12,11 @@ namespace AppBundle\Form;
 use AppBundle\Repository\CategorieRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OperationFormType extends AbstractType
+class PointageOperationFormType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -25,21 +24,24 @@ class OperationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('dateOperation', DateType::class, ['widget' => 'single_text'])
-            ->add('dateValeur', DateType::class, ['required' => false, 'widget' => 'single_text'])
-            ->add('libelle')
-            ->add('montant')
-            ->add('modePaiement')
             ->add('categorie', EntityType::class, [
-                'required' => false,
                 'class' => 'AppBundle\Entity\Categorie',
+                'choice_label' => 'libelle',
                 'group_by' => 'parent',
-                'query_builder' => function(CategorieRepository $repository) {
-                    return $repository->findByParentNotNull();
+                'query_builder' => function(CategorieRepository $qb) {
+                    return $qb->findByParentNotNull();
                 }
             ])
-            ->add('save', SubmitType::class, ['attr' => ['class'=>'btn-success']]);
-    }
+            ->add('operation', EntityType::class, [
+                'class' => 'AppBundle\Entity\Operation',
+                'choice_label' => 'libelle',
+                'attr' => [
+                    'readonly' => true
+                ]
+            ])
+            ->add('save', SubmitType::class, ['label' => 'OK']);
+        ;
+     }
 
     /**
      * {@inheritdoc}
@@ -47,7 +49,7 @@ class OperationFormType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'AppBundle\Entity\Operation',
+            'data_class' => 'AppBundle\Entity\PointageOperation',
         ]);
     }
 }

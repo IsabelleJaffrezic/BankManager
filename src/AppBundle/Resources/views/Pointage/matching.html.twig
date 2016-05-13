@@ -1,0 +1,15 @@
+<h1>A pointer</h1>
+
+<table class="table table-condensed">
+    {% for pointageOperationForm in pointageListForm %}
+        {% form_theme pointageOperationForm 'bootstrap_3_layout.html.twig' %}
+        <tr>
+            <td>{{ form_start(pointageOperationForm) }}{{ pointageOperationForm.operation.vars.data.libelle }}</td>
+            <td>{{ pointageOperationForm.operation.vars.data.dateOperation|date('d/m/Y') }}</td>
+            <td>{{ pointageOperationForm.operation.vars.data.montant|number_format(2, ',', ' ') }} €</td>
+            <td>{{ form_widget(pointageOperationForm.categorie) }}</td>
+            <td>{{ form_widget(pointageOperationForm.save, { 'attr': {'class':'btn btn-success'} }) }}</td>
+            <td style="display: none">{{ form_end(pointageOperationForm) }}</td>
+        </tr>
+    {% endfor %}
+</table>

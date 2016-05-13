@@ -11,7 +11,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Operation
+ * Pointage
  *
  * @ORM\Table(name="pointage")
  * @ORM\Entity(repositoryClass="AppBundle\Repository\PointageRepository")

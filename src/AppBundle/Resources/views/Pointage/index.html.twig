@@ -1,6 +1,8 @@
 {% extends '::base.html.twig' %}
 
 {% block body %}
+    {{ render(controller('AppBundle:Pointage:matching')) }}
+
     <h1>
         Liste des pointages
         <a href="{{ path('app_pointage_post') }}" class="btn btn-success">Nouveau pointage</a>

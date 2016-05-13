@@ -1,22 +1,30 @@
 {% extends '::base.html.twig' %}
 
-{% block body %}
-    <h1>
-        {{ compte.libelle }}
-        <a href="{{ path('app_compte_index') }}" class="btn btn-sm btn-default">Retour à la liste</a>
+{% form_theme formFilter 'bootstrap_3_layout.html.twig' %}
 
-    </h1>
+{% block body %}
+    <h1>{{ compte.libelle }}</h1>
     <div class="row-fluid">
-        <div class="col-md-2">
+        <div class="col-md-3">
+            <strong>Solde : {{ compte.currentSolde|number_format(2, ',', ' ') }} €</strong> <br/>
+            Prévisionnel : {{ compte.soldePrevisionnel|number_format(2, ',', ' ') }} €
             <p>
-                <strong>Solde : {{ compte.currentSolde|number_format(2, ',', ' ') }} €</strong> <br/>
-                Prévisionnel : {{ compte.soldePrevisionnel|number_format(2, ',', ' ') }} €
+                <a href="{{ path('app_operation_post', {'compte':compte.id}) }}" class="btn btn-block btn-success">Nouvelle opération</a>
+                <a href="{{ path('app_operation_index', { 'compte':compte.id }) }}?categorie=none" class="btn btn-default btn-block btn-warning">Opérations à pointer</a>
             </p>
-            <p>
-                <a href="{{ path('app_operation_post', {'compte':compte.id}) }}" class="btn btn-sm btn-block btn-success">Nouvelle opération</a>
-            </p>
+            {{ form_start(formFilter) }}
+            <div class="form-group">
+                {{ form_widget(formFilter.libelle) }}
+            </div>
+            <div class="input-group">
+                {{ form_widget(formFilter.categorie, { 'attr': {'class':'form-control'} }) }}
+                <span class="input-group-btn">
+                    {{ form_widget(formFilter.filter, { 'attr': {'class':'btn btn-default'} }) }}
+                </span>
+            </div>
+            {{ form_end(formFilter) }}
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
             <table class="table table-bordered table-condensed table-striped">
                 <tr>
                     <th class="text-center width100">Date opération</th>
@@ -33,7 +41,10 @@
                         <td class="text-center">{{ operation.dateOperation|date('d/m/Y')}}</td>
                         <td class="text-center">{{ operation.dateValeur is not null ? operation.dateValeur|date('d/m/Y') : null }}</td>
                         <td class="">{{ operation.modePaiement }}</td>
-                        <td class=""><a href="{{ path('app_operation_put', { 'operation':operation.id }) }}">{{ operation.libelle }}</a></td>
+                        <td class="">
+                            <span class="label label-primary">{{ operation.categorie }}</span>
+                            <a href="{{ path('app_operation_put', { 'operation':operation.id }) }}">{{ operation.libelle }}</a>
+                        </td>
                         {% if operation.montant > 0 %}
                             <td class="text-right"></td>
                             <td class="text-right text-success">{{ operation.montant|number_format(2, ',', ' ') }} €</td>

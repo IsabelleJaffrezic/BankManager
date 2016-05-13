@@ -1,15 +1,22 @@
 <?php
+/**
+ * Created by PhpStorm.
+ * User: zazhu
+ * Date: 14/05/16
+ * Time: 17:25
+ */
 
 namespace AppBundle\Controller;
+
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
-class CompteController extends Controller
+class HomeController extends Controller
 {
     /**
-     * @Route("/comptes")
+     * @Route("/", name="homepage")
      */
     public function indexAction(Request $request)
     {
@@ -18,9 +25,8 @@ class CompteController extends Controller
             ->getRepository('AppBundle:Compte')
             ->findAll();
 
-        // replace this example code with whatever you need
-        return $this->render('AppBundle:Compte:index.html.twig', [
-            'compteListe' => $compteListe,
-        ]);
+        $compte = array_pop($compteListe);
+
+        return $this->forward('AppBundle:Operation:index', ['compte' => $compte], $request->query->all());
     }
 }

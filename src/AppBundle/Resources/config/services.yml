@@ -9,3 +9,6 @@ services:
     app.service.compte:
         class: AppBundle\Service\CompteService
         arguments: ['@doctrine.orm.default_entity_manager']
+    app.service.pointage:
+        class: AppBundle\Service\PointageService
+        arguments: ['@doctrine.orm.entity_manager']

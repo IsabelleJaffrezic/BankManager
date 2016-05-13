@@ -1,6 +1,7 @@
 <?php
 
 namespace AppBundle\Repository;
+use AppBundle\Entity\Categorie;
 use AppBundle\Entity\Compte;
 use AppBundle\Entity\Operation;
 
@@ -12,30 +13,70 @@ use AppBundle\Entity\Operation;
  */
 class OperationRepository extends \Doctrine\ORM\EntityRepository
 {
-    public function findAPointerByCompte(Compte $compte)
+    public function findAPointerByCompte(Compte $compte, $filter)
     {
+        $query = 'SELECT o, m 
+                  FROM AppBundle:Operation o
+                  LEFT JOIN o.modePaiement m
+                  WHERE o.dateValeur IS NULL AND o.compte = :compte';
+
+        if (array_key_exists('categorie', $filter) && $filter['categorie'] === 'none') {
+            $query .= ' AND o.categorie IS NULL';
+        } elseif (array_key_exists('categorie', $filter) && ctype_digit($filter['categorie'])) {
+            $query .= ' AND o.categorie = :categorie';
+        }
+
+        if (array_key_exists('libelle', $filter) && !empty($filter['libelle'])) {
+            $query .= ' AND o.libelle LIKE :libelle';
+        }
+
+        $query .= ' ORDER BY o.dateOperation DESC';
+
         $operationList = $this->_em
-            ->createQuery(
-                'SELECT o, m 
-                 FROM AppBundle:Operation o
-                 LEFT JOIN o.modePaiement m
-                 WHERE o.dateValeur IS NULL AND o.compte = :compte
-                 ORDER BY o.dateOperation DESC')
+            ->createQuery($query)
             ->setParameter('compte', $compte);
+
+        if (array_key_exists('categorie', $filter) && ctype_digit($filter['categorie']) && $filter['categorie'] !== 'none') {
+            $operationList->setParameter('categorie', $filter['categorie']);
+        }
+
+        if (array_key_exists('libelle', $filter) && !empty($filter['libelle'])) {
+            $operationList->setParameter('libelle', '%'.$filter['libelle'].'%');
+        }
 
         return $operationList->getResult();
     }
 
-    public function findPointeeByCompte(Compte $compte)
+    public function findPointeeByCompte(Compte $compte, $filter)
     {
-        $operationList = $this->_em
-            ->createQuery(
-                'SELECT o, m 
+        $query = 'SELECT o, m 
                  FROM AppBundle:Operation o
                  LEFT JOIN o.modePaiement m
-                 WHERE o.dateValeur IS NOT NULL AND o.compte = :compte
-                 ORDER BY o.dateOperation DESC')
+                 WHERE o.dateValeur IS NOT NULL AND o.compte = :compte';
+
+        if (array_key_exists('categorie', $filter) && $filter['categorie'] === 'none') {
+            $query .= ' AND o.categorie IS NULL';
+        } elseif (array_key_exists('categorie', $filter) && ctype_digit($filter['categorie'])) {
+            $query .= ' AND o.categorie = :categorie';
+        }
+
+        if (array_key_exists('libelle', $filter) && !empty($filter['libelle'])) {
+            $query .= ' AND o.libelle LIKE :libelle';
+        }
+
+        $query .= ' ORDER BY o.dateOperation DESC';
+
+        $operationList = $this->_em
+            ->createQuery($query)
             ->setParameter('compte', $compte);
+
+        if (array_key_exists('categorie', $filter) && ctype_digit($filter['categorie']) && $filter['categorie'] !== 'none') {
+            $operationList->setParameter('categorie', $filter['categorie']);
+        }
+
+        if (array_key_exists('libelle', $filter) && !empty($filter['libelle'])) {
+            $operationList->setParameter('libelle', '%'.$filter['libelle'].'%');
+        }
 
         return $operationList->getResult();
     }

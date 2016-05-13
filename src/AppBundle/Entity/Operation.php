@@ -217,6 +217,10 @@ class Operation
     {
         $this->modePaiement = $modePaiement;
     }
-    
+
+    public function __toString()
+    {
+        return $this->libelle;
+    }
 }
 

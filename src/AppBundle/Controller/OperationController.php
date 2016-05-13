@@ -9,13 +9,20 @@
 namespace AppBundle\Controller;
 
 
+use AppBundle\Entity\Categorie;
 use AppBundle\Entity\Compte;
 use AppBundle\Entity\Operation;
+use AppBundle\Form\CategorieFormType;
+use AppBundle\Form\FilterOperationFormType;
 use AppBundle\Form\OperationFormType;
+use AppBundle\Repository\CategorieRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -36,15 +43,23 @@ class OperationController extends Controller
      */
     public function indexAction(Request $request, Compte $compte)
     {
+        $filterCategorie = $request->get('categorie', null);
+        $filterLibelle = $request->get('libelle', null);
+
+        $filter = [
+            'categorie' => $filterCategorie,
+            'libelle' => $filterLibelle,
+        ];
+
         $operationsAPointer = $this
             ->get('doctrine.orm.default_entity_manager')
             ->getRepository('AppBundle:Operation')
-            ->findAPointerByCompte($compte);
+            ->findAPointerByCompte($compte, $filter);
 
         $operationsPointees = $this
             ->get('doctrine.orm.default_entity_manager')
             ->getRepository('AppBundle:Operation')
-            ->findPointeeByCompte($compte);
+            ->findPointeeByCompte($compte, $filter);
 
         $paginator  = $this->get('knp_paginator');
         $pagination = $paginator->paginate(
@@ -53,9 +68,32 @@ class OperationController extends Controller
             15
         );
 
+        $categorie = $filterCategorie !== null ? $this->get('doctrine')->getRepository('AppBundle:Categorie')->find($filterCategorie) : null;
+        $data = ['categorie' => $categorie, 'libelle' => $filterLibelle];
+        $filterForm = $this->get('form.factory')
+            ->createNamedBuilder(null, FormType::class, $data, ['method' => 'GET', 'csrf_protection' => false])
+            ->add('categorie', EntityType::class, [
+                'required' => false,
+                'class' => 'AppBundle\Entity\Categorie',
+                'placeholder' => 'Pas de filtre',
+                'group_by' => 'parent',
+                'query_builder' => function(CategorieRepository $repository) {
+                    return $repository->findByParentNotNull();
+                }])
+            ->add('libelle', TextType::class, [
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Libellé...'
+                ]
+            ])
+            ->add('filter', SubmitType::class, ['label' => 'Filtrer'])
+            ->getForm()
+        ;
+
         return [
             'pagination' => $pagination,
             'compte' => $compte,
+            'formFilter' => $filterForm->createView()
         ];
     }
 
