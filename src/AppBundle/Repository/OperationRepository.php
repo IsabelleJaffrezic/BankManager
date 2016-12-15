@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 use AppBundle\Entity\Compte;
+use AppBundle\Entity\Operation;
 
 /**
  * OperationRepository
@@ -37,5 +38,20 @@ class OperationRepository extends \Doctrine\ORM\EntityRepository
             ->setParameter('compte', $compte);
 
         return $operationList->getResult();
+    }
+
+    public function findOperation(Operation $operation)
+    {
+        $qb = $this->createQueryBuilder('o')
+            ->where('o.libelle = :libelle')->setParameter('libelle', $operation->getLibelle())
+            ->andWhere('o.modePaiement = :modepaiement')->setParameter('modepaiement', $operation->getModePaiement()->getId())
+            ->andWhere('o.montant = :montant')->setParameter('montant', $operation->getMontant())
+            ->andWhere('o.dateOperation = :dateOperation')->setParameter('dateOperation', $operation->getDateOperation()->format('Y-m-d'));
+
+        if ($operation->getDateValeur() instanceof \DateTime) {
+            $qb->andWhere('o.dateValeur = :dateValeur')->setParameter('dateValeur', $operation->getDateValeur()->format('Y-m-d'));
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

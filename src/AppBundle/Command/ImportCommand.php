@@ -48,6 +48,8 @@ class ImportCommand extends ContainerAwareCommand
             $result = $importService->convertFile($file->getRealPath(), $compte);
             $output->writeln('-> Nb lignes dans le fichier : '.$result['nbLine']);
             $output->writeln('-> Nb lignes converties : '.$result['nbLineConvertie']);
+            $output->writeln('-> Nb doublons détectés : '.$result['nbDoublon']);
+            $output->writeln('-> Nb exceptions détectées : '.$result['nbException']);
 
             $fs->remove($file->getRealPath());
         }

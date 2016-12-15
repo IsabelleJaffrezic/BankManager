@@ -6,6 +6,7 @@ use AppBundle\Entity\ModePaiement;
 use AppBundle\Entity\Operation;
 use DateTime;
 use Doctrine\Common\Persistence\ObjectManager;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Created by PhpStorm.
@@ -16,42 +17,47 @@ use Doctrine\Common\Persistence\ObjectManager;
 class ImportService
 {
     private $om;
+    private $operationRepo;
+    private $result;
+    private $output;
 
     public function __construct(ObjectManager $objectManager)
     {
         $this->om = $objectManager;
+        $this->operationRepo = $this->om->getRepository('AppBundle:Operation');
+        $this->result = [
+            'nbLine' => 0,
+            'nbLineConvertie' => 0,
+            'nbDoublon' => 0,
+            'nbException' => 0,
+        ];
     }
 
-    public function convertFile($pathFile, Compte $compte)
+    public function convertFile($pathFile, Compte $compte, OutputInterface $output = null)
     {
         $file = file_get_contents($pathFile);
         $lines = explode("\n", $file);
 
-        $nbLineConverties = 0;
         foreach ($lines as $key => $line) {
-            if ($this->convertLine($line, $compte)) {
-                $nbLineConverties++;
-            }
+            $this->convertLine($line, $compte, $output);
         }
 
-        return [
-            'nbLine' => count($lines),
-            'nbLineConvertie' => $nbLineConverties,
-        ];
+        return $this->result;
     }
 
-    public function convertLine($line, Compte $compte)
+    public function convertLine($line, Compte $compte, OutputInterface $output = null)
     {
         try {
             $data = str_getcsv($line, ";");
 
             $modePaiementRepo = $this->om->getRepository('AppBundle:ModePaiement');
             $modePaiement = $modePaiementRepo->findOneBy(array('libelle' => $data[2]));
-            if (!($modePaiement instanceof ModePaiement) && !empty($modePaiement)) {
+            if (!$modePaiement instanceof ModePaiement) {
                 $modePaiement = new ModePaiement();
                 $modePaiement->setLibelle($data[2]);
 
                 $this->om->persist($modePaiement);
+                $this->om->flush();
             }
 
             $dateOperation = DateTime::createFromFormat('d/m/Y', $data[0]);
@@ -67,11 +73,20 @@ class ImportService
                 $operation->setDateValeur($dateValue);
             }
 
-            $this->om->persist($operation);
-            $this->om->flush();
+            if (null === $this->operationRepo->findOperation($operation)) {
+                $this->om->persist($operation);
+                $this->om->flush();
 
+                $this->result['nbLineConvertie']++;
+            } else {
+                $this->result['nbDoublon']++;
+            }
             return true;
         } catch (\Exception $e) {
+            if ($output instanceof OutputInterface) {
+                $output->writeln('<error>'.$e->getMessage().'</error>');
+            }
+            $this->result['nbException']++;
             return false;
         }
     }
